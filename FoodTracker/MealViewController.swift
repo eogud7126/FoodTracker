@@ -23,6 +23,7 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         super.viewDidLoad()
         
         nameTextField.delegate = self
+        updateSaveButtonState()
     }
 
     //MARK: Navigation
@@ -47,6 +48,9 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     
     //MARK: Action
 
+    @IBAction func cancel(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
     @IBAction func selectImageFromPhotoLibrary(_ sender: UITapGestureRecognizer) {
         //키보드 숨기기
         nameTextField.resignFirstResponder()
@@ -67,8 +71,12 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         textField.resignFirstResponder()
         return true
     }
-    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        saveButton.isEnabled = false
+    }
     func textFieldDidEndEditing(_ textField: UITextField){
+        updateSaveButtonState()
+        navigationItem.title = textField.text
     }
     
     //MARK: UIImagePickerControllerDelegate
@@ -85,6 +93,15 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         photoImageView.image = selectedImage
         //이미지 선택기 닫기
         dismiss(animated: true, completion: nil)
+    }
+    
+    
+    //MARK: Private Method
+    
+    private func updateSaveButtonState(){
+        //textField가 비어있으면 비활성화
+        let text = nameTextField.text ?? ""
+        saveButton.isEnabled = !text.isEmpty
     }
 }
 
