@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import os.log
 
 class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate , UINavigationControllerDelegate{
     //MARK: Properties
@@ -14,6 +15,9 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var ratingControl: RatingControl!
+    @IBOutlet weak var saveButton: UIBarButtonItem!
+    var meal: Meal?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +25,27 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         nameTextField.delegate = self
     }
 
-//MARK: Action
+    //MARK: Navigation
+    
+    //뷰 컨트롤러가 나타나기 전에 알아차릴 수 있도록
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        
+        //Configure the destination view controller only when the save button is pressed = 저장 버튼을 누른 경우에만 대상보기 컨트롤러를 구성하십시오
+        guard let button = sender as? UIBarButtonItem, button === saveButton else{
+            os_log("The save button was not pressed, cancelling",log:OSLog.default, type: .debug)
+            return
+        }
+        let name = nameTextField.text ?? ""
+        let photo = photoImageView.image
+        let rating = ratingControl.rating
+        
+        meal = Meal(name: name, photo: photo, rating: rating)
+    }
+    
+    
+    
+    //MARK: Action
 
     @IBAction func selectImageFromPhotoLibrary(_ sender: UITapGestureRecognizer) {
         //키보드 숨기기
