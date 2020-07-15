@@ -23,6 +23,12 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         super.viewDidLoad()
         
         nameTextField.delegate = self
+        if let meal = meal {
+            navigationItem.title = meal.name
+            nameTextField.text = meal.name
+            photoImageView.image = meal.photo
+            ratingControl.rating = meal.rating
+        }
         updateSaveButtonState()
     }
 
@@ -49,7 +55,17 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     //MARK: Action
 
     @IBAction func cancel(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
+        //Depending on style of presentation (modal or push presentation), this view controller needs to be dismissed in two different ways.
+        let isPresentingAddMealMore = presentingViewController is UINavigationController
+        
+        if isPresentingAddMealMore{
+            dismiss(animated: true, completion: nil)
+        }
+        else if let owningNavigationController = navigationController{
+            owningNavigationController.popViewController(animated: true)
+        }else{
+            fatalError("The MealViewController is not inside a navigation controller")
+        }
     }
     @IBAction func selectImageFromPhotoLibrary(_ sender: UITapGestureRecognizer) {
         //키보드 숨기기

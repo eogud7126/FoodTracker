@@ -44,6 +44,7 @@
                                     <outlet property="nameLabel" destination="cDF-HQ-tyW" id="HCF-n5-aez"/>
                                     <outlet property="photoImageView" destination="bzB-0B-HTk" id="byk-w7-Sum"/>
                                     <outlet property="ratingControl" destination="5yI-eH-igh" id="qpA-JV-Tsh"/>
+                                    <segue destination="BYZ-38-t0r" kind="show" identifier="ShowDetail" id="vYM-6V-VHw"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -55,7 +56,7 @@
                     <navigationItem key="navigationItem" title="Your Meals" id="GWP-Ld-SxH">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Tdc-5i-4Bl">
                             <connections>
-                                <segue destination="87X-J6-NVK" kind="show" identifier="AddItem" id="nzg-eP-NJC"/>
+                                <segue destination="87X-J6-NVK" kind="show" identifier="AddItem" id="McN-vC-Um1"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -72,8 +73,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ye5-kQ-h8Z">
-                                <rect key="frame" x="20" y="108" width="394" height="460"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="ye5-kQ-h8Z">
+                                <rect key="frame" x="20" y="108" width="394" height="454"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter meal name." textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9P2-Dd-Ota">
                                         <rect key="frame" x="8" y="0.0" width="378" height="34"/>
@@ -90,8 +91,8 @@
                                             <outletCollection property="gestureRecognizers" destination="Ze3-Si-ybK" appends="YES" id="zu2-cE-W0z"/>
                                         </connections>
                                     </imageView>
-                                    <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="OWA-bx-wtv" customClass="RatingControl" customModule="FoodTracker" customModuleProvider="target">
-                                        <rect key="frame" x="71" y="410" width="252" height="50"/>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="OWA-bx-wtv" customClass="RatingControl" customModule="FoodTracker" customModuleProvider="target">
+                                        <rect key="frame" x="71" y="410" width="252" height="44"/>
                                     </stackView>
                                 </subviews>
                                 <constraints>
@@ -172,10 +173,13 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Z7c-ZT-o0w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1096" y="94"/>
+            <point key="canvasLocation" x="1104" y="-277"/>
         </scene>
     </scenes>
     <resources>
         <image name="defaultPhoto" width="360" height="360"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="vYM-6V-VHw"/>
+    </inferredMetricsTieBreakers>
 </document>

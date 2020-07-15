@@ -8,9 +8,38 @@
 
 import Foundation
 import UIKit
+import os.log
 
-class Meal{
+class Meal: NSObject, NSCoding{
+    //MARK: NSCoding required
+    func encode(with aCoder: NSCoder) {
+        
+        aCoder.encode(name, forKey: PropertyKey.name)
+        aCoder.encode(photo, forKey: PropertyKey.photo)
+        aCoder.encode(rating, forKey: PropertyKey.rating)
+    }
+    
+    required convenience init?(coder aDecoder: NSCoder) {
+        // name은 필수. 만약 name을 디코딩하지 못한다면 이니셜라이즈는 실패할 것이다.
+        guard let name = aDecoder.decodeObject(forKey: PropertyKey.name) as? String else{
+            os_log("Unable to decode the name for a Meal object.", log: OSLog.default, type:.debug)
+            return nil
+        }
+        let photo = aDecoder.decodeObject(forKey: PropertyKey.photo) as? UIImage
+        let rating = aDecoder.decodeInteger(forKey: PropertyKey.rating)
+        
+        //반드시 필요한 designated init
+        self.init(name: name, photo: photo, rating: rating)
+    }
+    
     //MARK: Properties
+    
+    struct PropertyKey{
+        static let name = "name"
+        static let photo = "photo"
+        static let rating = "rating"
+    }
+    
     var name: String
     var photo: UIImage?
     var rating: Int
@@ -39,5 +68,11 @@ class Meal{
         self.photo = photo
         self.rating = rating
     }
+
+
+    //MARK: Archiving Paths
+     
+    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+    static let ArchiveURL = DocumentsDirectory.appendingPathComponent("meals")
 }
 
