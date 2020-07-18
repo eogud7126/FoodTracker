@@ -30,7 +30,6 @@ class MealTableViewController: UITableViewController {
                 meals.append(meal)
                 tableView.insertRows(at: [newIndexPath], with: .automatic)
             }
-            saveMeals()
         }
     }
     
@@ -58,14 +57,6 @@ class MealTableViewController: UITableViewController {
         meals += [meal1,meal2,meal3]
     }
     
-    private func saveMeals(){
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(meals, toFile: Meal.ArchiveURL.path)
-        if isSuccessfulSave{
-            os_log("Meals successfully saved.", log: OSLog.default, type:.debug)
-        }else{
-            os_log("Failed to save meals...", log: OSLog.default, type: .error)
-        }
-    }
     //MARK: override
     
     
@@ -73,14 +64,9 @@ class MealTableViewController: UITableViewController {
         super.viewDidLoad()
         
         navigationItem.leftBarButtonItem = editButtonItem
-        
-        //Load any saved meals, otherwise load sample data.
-        if let savedMeals = loadMeals(){
-            meals += savedMeals
-        }else{
-            //load the sample data
+
             loadSampleMeals()
-        }
+        
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -113,7 +99,6 @@ class MealTableViewController: UITableViewController {
         if editingStyle == .delete{
             //데이터 소스에서 행을 삭제
             meals.remove(at: indexPath.row)
-            saveMeals()
             tableView.deleteRows(at: [indexPath], with: .fade)
         }else if editingStyle == .insert {
             //Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -150,10 +135,6 @@ class MealTableViewController: UITableViewController {
             fatalError("Unexpected Segue Identifier; \(segue.identifier)")
         }
         
-    }
-    
-    private func loadMeals() -> [Meal]? {
-        return NSKeyedUnarchiver.unarchiveObject(withFile: Meal.ArchiveURL.path) as? [Meal]
     }
 
 }
