@@ -11,23 +11,23 @@ import os.log
 
 class MealTableViewController: UITableViewController {
     //MARK: Properties
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
-    var meals = [Meal]()
     
     //MARK: Actions
     
     @IBAction func unwindToMealList(sender: UIStoryboardSegue){
+        
         if let sourceViewController = sender.source as? MealViewController ,
             let meal = sourceViewController.meal{
-            
             if let selectedIndexPath = tableView.indexPathForSelectedRow{
                 //목록 업데이트
-                meals[selectedIndexPath.row] = meal
+                self.appDelegate.meallist[selectedIndexPath.row] = meal
                 tableView.reloadRows(at: [selectedIndexPath], with: .none)
             }else{
-                let newIndexPath = IndexPath(row: meals.count, section: 0)
-                
-                meals.append(meal)
+                let newIndexPath = IndexPath(row: self.appDelegate.meallist.count, section: 0)
+                appDelegate.meallist.append(meal)
+                print(appDelegate.meallist)
                 tableView.insertRows(at: [newIndexPath], with: .automatic)
             }
         }
@@ -37,7 +37,9 @@ class MealTableViewController: UITableViewController {
     
     
     //MARK: Private Methods
+
     private func loadSampleMeals(){
+        
         let photo1 = UIImage(named: "meal1")
         let photo2 = UIImage(named: "meal2")
         let photo3 = UIImage(named: "meal3")
@@ -54,7 +56,8 @@ class MealTableViewController: UITableViewController {
             fatalError("Unable to instantiate meal3")
         }
         
-        meals += [meal1,meal2,meal3]
+        self.appDelegate.meallist += [meal1,meal2,meal3]
+        
     }
     
     //MARK: override
@@ -62,23 +65,30 @@ class MealTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        loadSampleMeals()
         navigationItem.leftBarButtonItem = editButtonItem
-
-            loadSampleMeals()
-        
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        self.tableView.reloadData()
+      //  print(self.appDelegate.meallist)
     }
     
+    
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
+        // #warning Incomplete implementation, return the number of sections
         return 1
     }
     
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return meals.count
+        return self.appDelegate.meallist.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let meals = self.appDelegate.meallist[indexPath.row]
+
         //테이블 뷰 셀은 재사용되기 위해 셀 id를 사용해야한다.
         let cellIdentifier = "MealTableViewCell"
         
@@ -88,17 +98,16 @@ class MealTableViewController: UITableViewController {
         }
         
         //적절한 meal을 레이아웃에 배치한다. meals 배열에서 가져옴.
-        let meal = meals[indexPath.row]
-        cell.nameLabel.text = meal.name
-        cell.photoImageView.image = meal.photo
-        cell.ratingControl.rating = meal.rating
-        
+        cell.nameLabel?.text = meals.name
+        cell.photoImageView?.image = meals.photo
+        cell.ratingControl?.rating = meals.rating
+
         return cell
     }
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete{
             //데이터 소스에서 행을 삭제
-            meals.remove(at: indexPath.row)
+            self.appDelegate.meallist.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }else if editingStyle == .insert {
             //Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -112,29 +121,29 @@ class MealTableViewController: UITableViewController {
     
     
     //MARK: Navigation
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        super.prepare(for: segue, sender: sender)
-        
-        switch(segue.identifier ?? ""){
-        case "AddItem":
-            os_log("Adding a new meal.", log: OSLog.default, type: .debug)
-        case "ShowDetail":
-            guard let mealDetailViewController = segue.destination as? MealViewController else{
-                fatalError("Unexpected destination: \(segue.destination)")
-            }
-            guard let selectedMealCell = sender as? MealTableViewCell else{
-                fatalError("Unexpected sender: \(sender)")
-            }
-            guard let indexPath = tableView.indexPath(for: selectedMealCell) else{
-                fatalError("The selected cell is not being displayed by the table")
-            }
-            let selectedMeal = meals[indexPath.row]
-            mealDetailViewController.meal = selectedMeal
-        default:
-            fatalError("Unexpected Segue Identifier; \(segue.identifier)")
-        }
-        
-    }
+//    
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        super.prepare(for: segue, sender: sender)
+//        
+//        switch(segue.identifier ?? ""){
+//        case "AddItem":
+//            os_log("Adding a new meal.", log: OSLog.default, type: .debug)
+//        case "ShowDetail":
+//            guard let mealDetailViewController = segue.destination as? MealViewController else{
+//                fatalError("Unexpected destination: \(segue.destination)")
+//            }
+//            guard let selectedMealCell = sender as? MealTableViewCell else{
+//                fatalError("Unexpected sender: \(sender)")
+//            }
+//            guard let indexPath = tableView.indexPath(for: selectedMealCell) else{
+//                fatalError("The selected cell is not being displayed by the table")
+//            }
+//            let selectedMeal = self.appDelegate.meallist[indexPath.row]
+//            mealDetailViewController.meal = selectedMeal
+//        default:
+//            fatalError("Unexpected Segue Identifier; \(segue.identifier)")
+//        }
+//        
+//    }
 
 }

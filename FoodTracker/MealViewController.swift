@@ -27,7 +27,7 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
             navigationItem.title = meal.name
             nameTextField.text = meal.name
             photoImageView.image = meal.photo
-            ratingControl.rating = meal.rating
+            ratingControl.rating = meal.rating ?? 0
         }
         updateSaveButtonState()
     }
@@ -43,11 +43,13 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
             os_log("The save button was not pressed, cancelling",log:OSLog.default, type: .debug)
             return
         }
+        
         let name = nameTextField.text ?? ""
         let photo = photoImageView.image
         let rating = ratingControl.rating
         
         meal = Meal(name: name, photo: photo, rating: rating)
+       // print(name ?? "aaaaa")
     }
     
     
