@@ -16,43 +16,38 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var ratingControl: RatingControl!
     @IBOutlet weak var saveButton: UIBarButtonItem!
-    var meal: Meal?
     
+    
+    lazy var dao = MealDAO()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         nameTextField.delegate = self
-        if let meal = meal {
-            navigationItem.title = meal.name
-            nameTextField.text = meal.name
-            photoImageView.image = meal.photo
-            ratingControl.rating = meal.rating ?? 0
-        }
         updateSaveButtonState()
     }
 
-    //MARK: Navigation
-    
-    //뷰 컨트롤러가 나타나기 전에 알아차릴 수 있도록
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        super.prepare(for: segue, sender: sender)
+
+    @IBAction func save(_ sender: Any) {
+        //MemoData 객체를 생성하고 데이터를 담음
+        let meal = Meal()
         
-        //Configure the destination view controller only when the save button is pressed = 저장 버튼을 누른 경우에만 대상보기 컨트롤러를 구성하십시오
-        guard let button = sender as? UIBarButtonItem, button === saveButton else{
-            os_log("The save button was not pressed, cancelling",log:OSLog.default, type: .debug)
-            return
-        }
+        meal.name = self.nameTextField.text ?? ""
+        meal.photo = self.photoImageView.image
+        meal.rating = self.ratingControl.rating
         
-        let name = nameTextField.text ?? ""
-        let photo = photoImageView.image
-        let rating = ratingControl.rating
+        self.dao.insert(meal)
         
-        meal = Meal(name: name, photo: photo, rating: rating)
-       // print(name ?? "aaaaa")
+        print(meal.name ?? "aaaaa")
+
+
+        self.navigationController?.popViewController(animated: true)
     }
     
+
     
+    //MARK: Navigation
     
     //MARK: Action
 

@@ -15,9 +15,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <searchBar key="tableHeaderView" contentMode="redraw" text="" id="xX9-Mk-u5T">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <outlet property="delegate" destination="Pus-M4-IpA" id="6hg-Za-suq"/>
+                            </connections>
+                        </searchBar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MealTableViewCell" id="ETp-Cv-GJ0" customClass="MealTableViewCell" customModule="FoodTracker" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="414" height="90"/>
+                                <rect key="frame" x="0.0" y="72" width="414" height="90"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ETp-Cv-GJ0" id="3qL-ag-1wY">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="90"/>
@@ -56,10 +64,13 @@
                     <navigationItem key="navigationItem" title="Your Meals" id="GWP-Ld-SxH">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Tdc-5i-4Bl">
                             <connections>
-                                <segue destination="87X-J6-NVK" kind="show" identifier="AddItem" id="McN-vC-Um1"/>
+                                <segue destination="BYZ-38-t0r" kind="show" id="wtk-i0-1tc"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="searchBar" destination="xX9-Mk-u5T" id="itO-t1-qqH"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f29-ZL-YDu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -68,7 +79,7 @@
         <!--New Meal-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="MealViewController" customModule="FoodTracker" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MealForm" id="BYZ-38-t0r" customClass="MealViewController" customModule="FoodTracker" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -117,7 +128,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="save" id="ce6-Qm-vZ5">
                             <connections>
-                                <segue destination="XpZ-fr-z58" kind="unwind" unwindAction="unwindToMealListWithSender:" id="H9v-5h-InK"/>
+                                <action selector="save:" destination="BYZ-38-t0r" id="bQd-pL-K3M"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -129,7 +140,6 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-                <exit id="XpZ-fr-z58" userLabel="Exit" sceneMemberID="exit"/>
                 <tapGestureRecognizer id="Ze3-Si-ybK">
                     <connections>
                         <action selector="selectImageFromPhotoLibrary:" destination="BYZ-38-t0r" id="oGj-61-USH"/>
@@ -156,30 +166,11 @@
             </objects>
             <point key="canvasLocation" x="-633.33333333333337" y="93.75"/>
         </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="lvI-Bj-qwM">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="87X-J6-NVK" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationItem key="navigationItem" id="rp5-OE-Rf8"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="T5G-40-0sT">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="eYt-cA-k0L"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Z7c-ZT-o0w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1104" y="-277"/>
-        </scene>
     </scenes>
     <resources>
         <image name="defaultPhoto" width="360" height="360"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="vYM-6V-VHw"/>
+        <segue reference="wtk-i0-1tc"/>
     </inferredMetricsTieBreakers>
 </document>

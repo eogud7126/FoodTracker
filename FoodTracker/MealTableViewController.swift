@@ -9,68 +9,32 @@
 import UIKit
 import os.log
 
-class MealTableViewController: UITableViewController {
+class MealTableViewController: UITableViewController, UISearchBarDelegate {
     //MARK: Properties
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
-    
-    //MARK: Actions
-    
-    @IBAction func unwindToMealList(sender: UIStoryboardSegue){
-        
-        if let sourceViewController = sender.source as? MealViewController ,
-            let meal = sourceViewController.meal{
-            if let selectedIndexPath = tableView.indexPathForSelectedRow{
-                //목록 업데이트
-                self.appDelegate.meallist[selectedIndexPath.row] = meal
-                tableView.reloadRows(at: [selectedIndexPath], with: .none)
-            }else{
-                let newIndexPath = IndexPath(row: self.appDelegate.meallist.count, section: 0)
-                appDelegate.meallist.append(meal)
-                print(appDelegate.meallist)
-                tableView.insertRows(at: [newIndexPath], with: .automatic)
-            }
-        }
-    }
-    
+    lazy var dao = MealDAO()
+    @IBOutlet var searchBar: UISearchBar!
     
     
     
     //MARK: Private Methods
 
-    private func loadSampleMeals(){
-        
-        let photo1 = UIImage(named: "meal1")
-        let photo2 = UIImage(named: "meal2")
-        let photo3 = UIImage(named: "meal3")
-        
-        guard let meal1 = Meal(name: "Caprese Salad", photo: photo1, rating: 4)else{
-            fatalError("Unable to instantiate meal1")
-        }
-        
-        guard let meal2 = Meal(name: "Chicken and Potatoes", photo: photo2, rating: 5)else{
-            fatalError("Unable to instantiate meal2")
-        }
-        
-        guard let meal3 = Meal(name: "Pasta with Meatballs", photo: photo3, rating: 3)else{
-            fatalError("Unable to instantiate meal3")
-        }
-        
-        self.appDelegate.meallist += [meal1,meal2,meal3]
-        
-    }
     
     //MARK: override
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadSampleMeals()
         navigationItem.leftBarButtonItem = editButtonItem
+        searchBar.enablesReturnKeyAutomatically = false
     }
     override func viewWillAppear(_ animated: Bool) {
+        self.appDelegate.meallist = self.dao.fetch()
+        
+        print(self.appDelegate.meallist)
         self.tableView.reloadData()
-      //  print(self.appDelegate.meallist)
+
     }
     
     
@@ -100,15 +64,19 @@ class MealTableViewController: UITableViewController {
         //적절한 meal을 레이아웃에 배치한다. meals 배열에서 가져옴.
         cell.nameLabel?.text = meals.name
         cell.photoImageView?.image = meals.photo
-        cell.ratingControl?.rating = meals.rating
+        cell.ratingControl?.rating = meals.rating ?? 0
 
         return cell
     }
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let data = self.appDelegate.meallist[indexPath.row]
+        
         if editingStyle == .delete{
             //데이터 소스에서 행을 삭제
-            self.appDelegate.meallist.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            if dao.delete(data.objectID!){
+                self.appDelegate.meallist.remove(at: indexPath.row)
+                self.tableView.deleteRows(at: [indexPath], with: .fade)
+            }
         }else if editingStyle == .insert {
             //Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
@@ -119,31 +87,29 @@ class MealTableViewController: UITableViewController {
         return true
     }
     
-    
-    //MARK: Navigation
 //    
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        super.prepare(for: segue, sender: sender)
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        //meallist에서 선택된 행에 맞는 데이터를 꺼낸다.
+//        let row = self.appDelegate.meallist[indexPath.row]
 //        
-//        switch(segue.identifier ?? ""){
-//        case "AddItem":
-//            os_log("Adding a new meal.", log: OSLog.default, type: .debug)
-//        case "ShowDetail":
-//            guard let mealDetailViewController = segue.destination as? MealViewController else{
-//                fatalError("Unexpected destination: \(segue.destination)")
-//            }
-//            guard let selectedMealCell = sender as? MealTableViewCell else{
-//                fatalError("Unexpected sender: \(sender)")
-//            }
-//            guard let indexPath = tableView.indexPath(for: selectedMealCell) else{
-//                fatalError("The selected cell is not being displayed by the table")
-//            }
-//            let selectedMeal = self.appDelegate.meallist[indexPath.row]
-//            mealDetailViewController.meal = selectedMeal
-//        default:
-//            fatalError("Unexpected Segue Identifier; \(segue.identifier)")
+//        //상세화면 인스턴스 생성
+//        guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "MealForm") as? MealViewController else{
+//            return
 //        }
 //        
+//        //값을 전달한 다음 상세 화면으로 이동
+//        self.navigationController?.pushViewController(vc, animated: true)
 //    }
-
-}
+    
+    //MAKR: - UISearchBar DataSource
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let keyword = searchBar.text
+        
+        print(keyword)
+        self.appDelegate.meallist = self.dao.fetch(keyword: keyword)
+        self.tableView.reloadData()
+    }
+    
+    
+   }
