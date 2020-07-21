@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CE61D80124C521C500058CDD /* MealEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE61D80024C521C500058CDD /* MealEditViewController.swift */; };
 		CEB501D824C4723400DAF284 /* FoodTracker.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CEB501D624C4723400DAF284 /* FoodTracker.xcdatamodeld */; };
 		CEB501DA24C473AD00DAF284 /* MealDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB501D924C473AD00DAF284 /* MealDAO.swift */; };
 		CEB9C8A424BD30D100219462 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB9C8A324BD30D100219462 /* AppDelegate.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CE61D80024C521C500058CDD /* MealEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealEditViewController.swift; sourceTree = "<group>"; };
 		CEB501D724C4723400DAF284 /* FoodTracker.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FoodTracker.xcdatamodel; sourceTree = "<group>"; };
 		CEB501D924C473AD00DAF284 /* MealDAO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealDAO.swift; sourceTree = "<group>"; };
 		CEB9C8A024BD30D100219462 /* FoodTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FoodTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,6 +121,7 @@
 				CEB501D924C473AD00DAF284 /* MealDAO.swift */,
 				CEB9C8D724BD9B1600219462 /* MealTableViewCell.swift */,
 				CEB9C8A724BD30D100219462 /* MealViewController.swift */,
+				CE61D80024C521C500058CDD /* MealEditViewController.swift */,
 				CEB9C8D924BDA0A400219462 /* MealTableViewController.swift */,
 				CEB9C8A924BD30D100219462 /* Main.storyboard */,
 				CEB9C8AC24BD30D200219462 /* Assets.xcassets */,
@@ -278,6 +281,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEB9C8D624BD8F0C00219462 /* Meal.swift in Sources */,
+				CE61D80124C521C500058CDD /* MealEditViewController.swift in Sources */,
 				CEB9C8D424BD53FD00219462 /* RatingControl.swift in Sources */,
 				CEB9C8DA24BDA0A400219462 /* MealTableViewController.swift in Sources */,
 				CEB501DA24C473AD00DAF284 /* MealDAO.swift in Sources */,

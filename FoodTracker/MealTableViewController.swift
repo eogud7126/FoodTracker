@@ -11,15 +11,16 @@ import os.log
 
 class MealTableViewController: UITableViewController, UISearchBarDelegate {
     //MARK: Properties
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+//    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     lazy var dao = MealDAO()
     @IBOutlet var searchBar: UISearchBar!
     
     
+    var meallist = [Meal]()
     
     //MARK: Private Methods
-
+    
     
     //MARK: override
     
@@ -30,11 +31,10 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         searchBar.enablesReturnKeyAutomatically = false
     }
     override func viewWillAppear(_ animated: Bool) {
-        self.appDelegate.meallist = self.dao.fetch()
-        
-        print(self.appDelegate.meallist)
-        self.tableView.reloadData()
+        super.viewWillAppear(animated)
+        self.meallist = self.dao.fetch()
 
+        self.tableView.reloadData()
     }
     
     
@@ -47,12 +47,12 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return self.appDelegate.meallist.count
+        return meallist.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let meals = self.appDelegate.meallist[indexPath.row]
-
+        let meals = meallist[indexPath.row]
+        
         //테이블 뷰 셀은 재사용되기 위해 셀 id를 사용해야한다.
         let cellIdentifier = "MealTableViewCell"
         
@@ -65,16 +65,16 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         cell.nameLabel?.text = meals.name
         cell.photoImageView?.image = meals.photo
         cell.ratingControl?.rating = meals.rating ?? 0
-
+        
         return cell
     }
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        let data = self.appDelegate.meallist[indexPath.row]
+        let meal = meallist[indexPath.row]
         
         if editingStyle == .delete{
             //데이터 소스에서 행을 삭제
-            if dao.delete(data.objectID!){
-                self.appDelegate.meallist.remove(at: indexPath.row)
+            if dao.delete(meal.objectID!){
+                meallist.remove(at: indexPath.row)
                 self.tableView.deleteRows(at: [indexPath], with: .fade)
             }
         }else if editingStyle == .insert {
@@ -87,29 +87,29 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         return true
     }
     
-//    
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        //meallist에서 선택된 행에 맞는 데이터를 꺼낸다.
-//        let row = self.appDelegate.meallist[indexPath.row]
-//        
-//        //상세화면 인스턴스 생성
-//        guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "MealForm") as? MealViewController else{
-//            return
-//        }
-//        
-//        //값을 전달한 다음 상세 화면으로 이동
-//        self.navigationController?.pushViewController(vc, animated: true)
-//    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //meallist에서 선택된 행에 맞는 데이터를 꺼낸다.
+        let meal = meallist[indexPath.row]
+        
+        //상세화면 인스턴스 생성
+        guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "EditMeal") as? MealEditViewController else{
+            return
+        }
+        vc.param = meal
+        
+        //값을 전달한 다음 상세 화면으로 이동
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
     
     //MAKR: - UISearchBar DataSource
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let keyword = searchBar.text
         
-        print(keyword)
-        self.appDelegate.meallist = self.dao.fetch(keyword: keyword)
+        meallist = self.dao.fetch(keyword: keyword)
         self.tableView.reloadData()
     }
     
     
-   }
+}

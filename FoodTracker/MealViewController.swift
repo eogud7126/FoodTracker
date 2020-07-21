@@ -24,6 +24,7 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print("MealViewController")
         nameTextField.delegate = self
         updateSaveButtonState()
     }
@@ -36,12 +37,10 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         meal.name = self.nameTextField.text ?? ""
         meal.photo = self.photoImageView.image
         meal.rating = self.ratingControl.rating
-        
         self.dao.insert(meal)
         
+    
         print(meal.name ?? "aaaaa")
-
-
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -103,11 +102,20 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
             fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
         }
         //선택한 이미지를 이미지 뷰에 배치
-        photoImageView.image = selectedImage
+        photoImageView.image = resizeImage(image: selectedImage, newWidth: 200)
         //이미지 선택기 닫기
         dismiss(animated: true, completion: nil)
     }
     
+    func resizeImage(image: UIImage, newWidth: CGFloat) -> UIImage {
+        let scale = newWidth / image.size.width // 새 이미지 확대/축소 비율
+        let newHeight = image.size.height * scale
+        UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
+        image.draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage!
+    }
     
     //MARK: Private Method
     
