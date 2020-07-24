@@ -45,7 +45,6 @@ class MealDAO{
         //create worker thread
         let workerContext = NSManagedObjectContext.init(concurrencyType: .privateQueueConcurrencyType)
         workerContext.parent = self.mainContext
-                
         
         let object = NSEntityDescription.insertNewObject(forEntityName: "Meal", into: workerContext) as! MealMO
         
@@ -58,8 +57,13 @@ class MealDAO{
         }
                 
         print(Thread.current.isMainThread)
-        self.coreDataStack.saveWorkerContext(workerContext)
-        self.coreDataStack.mergeWithMainContext()
+        workerContext.perform {
+            print("메인스레드? ",Thread.current.isMainThread)
+            sleep(3)
+            self.coreDataStack.saveWorkerContext(workerContext)
+            self.coreDataStack.mergeWithMainContext()
+            self.postupdateNotification()
+        }
     }
     
     func delete(_ objectID: NSManagedObjectID) {

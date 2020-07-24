@@ -39,7 +39,7 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         meal.rating = self.ratingControl.rating
 
         self.dao.insert(meal)
-
+        
 
         
 //        print(meal.name ?? "aaaaa")
