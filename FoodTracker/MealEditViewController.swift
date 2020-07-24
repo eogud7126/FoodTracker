@@ -11,7 +11,7 @@ import UIKit
 class MealEditViewController: UIViewController {
 
     //MARK: - Properties
-    var param: Meal?
+    var param: MealMO?
     lazy var dao = MealDAO()
     
     @IBOutlet var name: UITextField!
@@ -22,7 +22,7 @@ class MealEditViewController: UIViewController {
     override func viewDidLoad() {
         
         self.name.text = param?.name ?? ""
-        self.photo.image = param?.photo
+        self.photo.image = UIImage(data: (param?.photo ?? nil)!)
         self.rating.rating = param?.rating ?? 0
 
         self.navigationItem.title = self.name.text
@@ -38,7 +38,7 @@ class MealEditViewController: UIViewController {
         meal.rating = self.rating.rating
         
         self.dao.insert(meal)
-        self.dao.delete(param!.objectID!)
+        self.dao.delete(param!.objectID)
         
         print(meal.name ?? "aaaaa")
 

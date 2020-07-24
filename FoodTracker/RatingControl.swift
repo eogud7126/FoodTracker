@@ -12,7 +12,7 @@ import UIKit
 
     //MARK: Properties
     private var ratingButtons = [UIButton]()
-    var rating = 0 {
+    var rating: Int16 = 0 {
         didSet {
             updateButtonSelectionStates()
         }
@@ -23,7 +23,7 @@ import UIKit
             setupButtons()
         }
     }
-    @IBInspectable var starCount: Int = 5 {
+    @IBInspectable var starCount: Int16 = 5 {
         didSet{
             setupButtons()
         }
@@ -47,7 +47,7 @@ import UIKit
             fatalError("The button, \(button), is not  in the ratingButtons array: \(ratingButtons)")
         }
         //선택된 버튼들 연산
-        let selectedRating = index + 1
+        let selectedRating: Int16 = Int16(index + 1)
         
         if selectedRating == rating {
             //만약 선택된 버튼이 현재의 값과 일치한다면 0으로 리셋

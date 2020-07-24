@@ -33,18 +33,19 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     @IBAction func save(_ sender: Any) {
         //MemoData 객체를 생성하고 데이터를 담음
         let meal = Meal()
-        
-        meal.name = self.nameTextField.text ?? ""
+
+        meal.name = self.nameTextField.text
         meal.photo = self.photoImageView.image
         meal.rating = self.ratingControl.rating
+
         self.dao.insert(meal)
+
+
         
-    
-        print(meal.name ?? "aaaaa")
+//        print(meal.name ?? "aaaaa")
         self.navigationController?.popViewController(animated: true)
     }
     
-
     
     //MARK: Navigation
     

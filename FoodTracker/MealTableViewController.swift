@@ -8,6 +8,7 @@
 
 import UIKit
 import os.log
+import CoreData
 
 class MealTableViewController: UITableViewController, UISearchBarDelegate {
     //MARK: Properties
@@ -17,7 +18,7 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
     @IBOutlet var searchBar: UISearchBar!
     
     
-    var meallist = [Meal]()
+    var meallist = [MealMO]()
     
     //MARK: Private Methods
     
@@ -32,8 +33,11 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.meallist = self.dao.fetch()
-
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(self.updateMealTableData), name: .updateMealTableData, object: nil)
+        meallist = self.dao.fetch()
+        print("viewWillAppear")
+        
         self.tableView.reloadData()
     }
     
@@ -63,9 +67,9 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         
         //적절한 meal을 레이아웃에 배치한다. meals 배열에서 가져옴.
         cell.nameLabel?.text = meals.name
-        cell.photoImageView?.image = meals.photo
-        cell.ratingControl?.rating = meals.rating ?? 0
-        
+        cell.photoImageView?.image = UIImage(data: (meals.photo ?? nil)!)
+        cell.ratingControl?.rating = meals.rating
+
         return cell
     }
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -73,10 +77,11 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         
         if editingStyle == .delete{
             //데이터 소스에서 행을 삭제
-            if dao.delete(meal.objectID!){
-                meallist.remove(at: indexPath.row)
-                self.tableView.deleteRows(at: [indexPath], with: .fade)
-            }
+            
+            self.meallist.remove(at: indexPath.row)
+            self.tableView.deleteRows(at: [indexPath], with: .fade)
+            dao.delete(meal.objectID)
+            
         }else if editingStyle == .insert {
             //Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
@@ -111,5 +116,13 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         self.tableView.reloadData()
     }
     
-    
+    @objc func updateMealTableData() {
+        print("Noti 호출")
+        self.meallist = self.dao.fetch()
+        self.tableView.reloadData()
+    }
+}
+
+extension Notification.Name {
+    static let updateMealTableData = Notification.Name("updateMealTableData")
 }
