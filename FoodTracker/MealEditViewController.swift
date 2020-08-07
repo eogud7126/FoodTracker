@@ -22,7 +22,7 @@ class MealEditViewController: UIViewController {
     override func viewDidLoad() {
         
         self.name.text = param?.name ?? ""
-        self.photo.image = UIImage(data: (param?.photo ?? nil)!)
+//        self.photo.image = UIImage(data: (param?.photo ?? nil)!)
         self.rating.rating = param?.rating ?? 0
 
         self.navigationItem.title = self.name.text
@@ -34,14 +34,14 @@ class MealEditViewController: UIViewController {
         let meal = Meal()
         
         meal.name = self.name.text ?? ""
-        meal.photo = self.photo.image
+//        meal.photo = self.photo.image
         meal.rating = self.rating.rating
         
-        self.dao.insert(meal)
-        self.dao.delete(param!.objectID)
+//        self.dao.insert(meal)
+//        self.dao.delete(param!.objectID)
         
         print(meal.name ?? "aaaaa")
-
+//        self.dao.insert()
 
         self.navigationController?.popViewController(animated: true)
     }

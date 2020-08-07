@@ -13,7 +13,6 @@ import CoreData
 class Meal{
     //MARK: Properties
     var name: String?
-    var photo: UIImage?
     var rating: Int16?
 
     //원본 MealMO 객체를 참조하기 위한 속성

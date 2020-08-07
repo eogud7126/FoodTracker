@@ -7,19 +7,19 @@
 //
 
 import UIKit
+import CoreData
 import os.log
 
-class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate , UINavigationControllerDelegate{
+class MealViewController: UIViewController, UITextFieldDelegate , UINavigationControllerDelegate{
     //MARK: Properties
     
-    @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var ratingControl: RatingControl!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     
     
     lazy var dao = MealDAO()
-
+    var object: MealMO?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,14 +32,15 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
 
     @IBAction func save(_ sender: Any) {
         //MemoData 객체를 생성하고 데이터를 담음
-        let meal = Meal()
 
-        meal.name = self.nameTextField.text
-        meal.photo = self.photoImageView.image
-        meal.rating = self.ratingControl.rating
-
-        self.dao.insert(meal)
-        
+        if object == nil {
+            let entity = NSEntityDescription.entity(forEntityName: "Meal", in: MealDAO.shared._fetchedResultsController!.managedObjectContext)
+            object = MealMO(entity: entity!, insertInto: MealDAO.shared._fetchedResultsController?.managedObjectContext)
+//            object = MealMO(context: self.dao.fetchedResultsController.managedObjectContext)
+        }
+        object?.name = self.nameTextField.text
+        object?.rating = self.ratingControl.rating
+        MealDAO.shared.insert()
 
         
 //        print(meal.name ?? "aaaaa")
@@ -64,19 +65,7 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
             fatalError("The MealViewController is not inside a navigation controller")
         }
     }
-    @IBAction func selectImageFromPhotoLibrary(_ sender: UITapGestureRecognizer) {
-        //키보드 숨기기
-        nameTextField.resignFirstResponder()
-        //이미지 선택 컨트롤러 만들기
-        let imagePickerController = UIImagePickerController()
-        //사진만 선택되도록(가져오는 위치 설정: 카메라롤)
-        imagePickerController.sourceType = .photoLibrary
-        //ViewController가 사용자가 이미지를 선택할 때 알아차릴 수 있도록 만든다.
-        imagePickerController.delegate = self
-        
-        present(imagePickerController,animated: true,completion: nil)
-        
-    }
+    
     
     //MARK: UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -93,30 +82,30 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     }
     
     //MARK: UIImagePickerControllerDelegate
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        //사용자가 취소하면 picker가 사라짐
-        dismiss(animated: true, completion: nil)
-    }
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        // The info dictionary may contain multiple representations of the image. You want to use the original.
-        guard let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else{
-            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
-        }
-        //선택한 이미지를 이미지 뷰에 배치
-        photoImageView.image = resizeImage(image: selectedImage, newWidth: 200)
-        //이미지 선택기 닫기
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func resizeImage(image: UIImage, newWidth: CGFloat) -> UIImage {
-        let scale = newWidth / image.size.width // 새 이미지 확대/축소 비율
-        let newHeight = image.size.height * scale
-        UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
-        image.draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return newImage!
-    }
+//    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+//        //사용자가 취소하면 picker가 사라짐
+//        dismiss(animated: true, completion: nil)
+//    }
+//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+//        // The info dictionary may contain multiple representations of the image. You want to use the original.
+//        guard let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else{
+//            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+//        }
+//        //선택한 이미지를 이미지 뷰에 배치
+//        photoImageView.image = resizeImage(image: selectedImage, newWidth: 200)
+//        //이미지 선택기 닫기
+//        dismiss(animated: true, completion: nil)
+//    }
+//    
+//    func resizeImage(image: UIImage, newWidth: CGFloat) -> UIImage {
+//        let scale = newWidth / image.size.width // 새 이미지 확대/축소 비율
+//        let newHeight = image.size.height * scale
+//        UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
+//        image.draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+//        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//        return newImage!
+//    }
     
     //MARK: Private Method
     

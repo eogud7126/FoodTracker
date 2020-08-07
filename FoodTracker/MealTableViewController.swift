@@ -10,15 +10,16 @@ import UIKit
 import os.log
 import CoreData
 
-class MealTableViewController: UITableViewController, UISearchBarDelegate {
+class MealTableViewController: UITableViewController, UISearchBarDelegate, NSFetchedResultsControllerDelegate {
     //MARK: Properties
 //    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     lazy var dao = MealDAO()
+    var fetchedResultsController: NSFetchedResultsController<MealMO>!
     @IBOutlet var searchBar: UISearchBar!
     
     
-    var meallist = [MealMO]()
+//    var meallist = [MealMO]()
     
     //MARK: Private Methods
     
@@ -28,6 +29,9 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        fetchedResultsController = MealDAO.shared.fetchedResultsController
+        fetchedResultsController.delegate = self
+        
         navigationItem.leftBarButtonItem = editButtonItem
         searchBar.enablesReturnKeyAutomatically = false
     }
@@ -35,13 +39,17 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         super.viewWillAppear(animated)
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(self.updateMealTableData), name: .updateMealTableData, object: nil)
-        meallist = self.dao.fetch()
+//        self.dao.fetch()
+        
         print("viewWillAppear")
         
         self.tableView.reloadData()
     }
     
-    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
@@ -51,11 +59,11 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return meallist.count
+        return fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let meals = meallist[indexPath.row]
+        let meals = fetchedResultsController.object(at: indexPath)
         
         //테이블 뷰 셀은 재사용되기 위해 셀 id를 사용해야한다.
         let cellIdentifier = "MealTableViewCell"
@@ -67,20 +75,19 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
         
         //적절한 meal을 레이아웃에 배치한다. meals 배열에서 가져옴.
         cell.nameLabel?.text = meals.name
-        cell.photoImageView?.image = UIImage(data: (meals.photo ?? nil)!)
+//        cell.photoImageView?.image = UIImage(data: (meals.photo ?? nil)!)
         cell.ratingControl?.rating = meals.rating
 
         return cell
     }
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        let meal = meallist[indexPath.row]
-        
+        let meal = fetchedResultsController.object(at: indexPath)
+
         if editingStyle == .delete{
             //데이터 소스에서 행을 삭제
-            
-            self.meallist.remove(at: indexPath.row)
-            self.tableView.deleteRows(at: [indexPath], with: .fade)
-            dao.delete(meal.objectID)
+//            self.meallist.remove(at: indexPath.row)
+//            self.tableView.deleteRows(at: [indexPath], with: .fade)
+            MealDAO.shared.delete(at: indexPath)
             
         }else if editingStyle == .insert {
             //Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -95,8 +102,8 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //meallist에서 선택된 행에 맞는 데이터를 꺼낸다.
-        let meal = meallist[indexPath.row]
-        
+        let meal = fetchedResultsController.object(at: indexPath)
+
         //상세화면 인스턴스 생성
         guard let vc = self.storyboard?.instantiateViewController(withIdentifier: "EditMeal") as? MealEditViewController else{
             return
@@ -112,14 +119,34 @@ class MealTableViewController: UITableViewController, UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let keyword = searchBar.text
         
-        meallist = self.dao.fetch(keyword: keyword)
+//        self.dao.fetch(keyword: keyword)
         self.tableView.reloadData()
     }
     
     @objc func updateMealTableData() {
         print("Noti 호출")
-        self.meallist = self.dao.fetch()
+//        self.dao.fetch()
         self.tableView.reloadData()
+    }
+    
+    //fetched Result Controller Delegate
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.beginUpdates()
+    }
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        print("asd")
+        if type == .insert {
+            print("ㅁㅁ")
+            self.tableView.insertRows(at: [newIndexPath!], with: .fade)
+        } else if type == .delete {
+            print("ㅃㅃ")
+            self.tableView.deleteRows(at: [indexPath!], with: .fade)
+        }
+    }
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("ㅁㄴㅇ")
+        tableView.endUpdates()
     }
 }
 

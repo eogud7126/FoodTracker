@@ -12,68 +12,83 @@ import CoreData
 class MealDAO{
         
     let coreDataStack = CoreDataStack()
-    
+    static let shared:MealDAO = MealDAO()
     lazy var mainContext: NSManagedObjectContext = coreDataStack.mainManagedObjectContext
     
     
-    func fetch(keyword text: String? = nil) -> [MealMO] {
-        var fetchResults = [MealMO]()
-        //        childContext.parent = context
-        //요청 객체 생성
+//    func fetch(keyword text: String? = nil) -> [MealMO] {
+//        var fetchResults = [MealMO]()
+//        //        childContext.parent = context
+//        //요청 객체 생성
+//        let fetchRequest: NSFetchRequest<MealMO> = MealMO.fetchRequest()
+//
+//        //평점 순으로 정렬
+//        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "rating", ascending: false)]
+//
+//        //검색 키워드가 있을 경우
+//        if let text = text, text.isEmpty == false{
+//            fetchRequest.predicate = NSPredicate(format: "name  CONTAINS[c] %@", text)
+//        }
+//
+//        do{
+//            fetchResults = try self.mainContext.fetch(fetchRequest)
+//
+//        }catch let error as NSError{
+//            NSLog("An error has occured: %s", error.localizedDescription)
+//        }
+//
+//        return fetchResults
+//    }
+//
+    var _fetchedResultsController: NSFetchedResultsController<MealMO>?
+    var fetchedResultsController: NSFetchedResultsController<MealMO> {
+        if _fetchedResultsController != nil {
+            return _fetchedResultsController!
+        }
+//        NSFetchedResultsController<NSFetchRequestResult>.deleteCache(withName: nil)
+        
         let fetchRequest: NSFetchRequest<MealMO> = MealMO.fetchRequest()
-        
-        //평점 순으로 정렬
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "rating", ascending: false)]
-        
-        //검색 키워드가 있을 경우
-        if let text = text, text.isEmpty == false{
-            fetchRequest.predicate = NSPredicate(format: "name  CONTAINS[c] %@", text)
+        fetchRequest.fetchBatchSize = 20
+        let sortDescriptor = NSSortDescriptor(key: "rating", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        _fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainContext, sectionNameKeyPath: nil, cacheName: nil)
+        do {
+            try _fetchedResultsController?.performFetch()
+        } catch  {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
-        
-        do{
-            fetchResults = try self.mainContext.fetch(fetchRequest)
-            
-        }catch let error as NSError{
-            NSLog("An error has occured: %s", error.localizedDescription)
-        }
-        
-        return fetchResults
+        return _fetchedResultsController!
     }
-    
-    func insert(_ meal: Meal){
+    func insert(){
         
         //create worker thread
-        let workerContext = NSManagedObjectContext.init(concurrencyType: .privateQueueConcurrencyType)
-        workerContext.parent = self.mainContext
+//        let workerContext = NSManagedObjectContext.init(concurrencyType: .privateQueueConcurrencyType)
+//        workerContext.parent = self.mainContext
+        guard let fetResults = _fetchedResultsController else { return }
+        let context = fetResults.managedObjectContext
         
-        let object = NSEntityDescription.insertNewObject(forEntityName: "Meal", into: workerContext) as! MealMO
-        
-        //Meal로부터 값을 복사
-        object.name = meal.name
-        object.rating = meal.rating ?? 0
-        
-        if let photo = meal.photo{
-            object.photo = photo.pngData()
+        do{
+            try context.save()
+            print("insert")
+        } catch let error as NSError {
+            print(error)
         }
-                
-        print(Thread.current.isMainThread)
-        workerContext.perform {
-            print("메인스레드? ",Thread.current.isMainThread)
-            sleep(3)
-            self.coreDataStack.saveWorkerContext(workerContext)
-            self.coreDataStack.mergeWithMainContext()
-            self.postupdateNotification()
-        }
+//            self.coreDataStack.saveWorkerContext(workerContext)
+//        self.coreDataStack.mergeWithMainContext()
+//            self.postupdateNotification()
+        
     }
     
-    func delete(_ objectID: NSManagedObjectID) {
-        //삭제할 객체를 찾고 컨텍스트에서 삭제
-        let object = self.mainContext.object(with: objectID)
-        self.mainContext.delete(object)
-        
-        //영구저장소 적용
-        self.coreDataStack.mergeWithMainContext()
-        self.postupdateNotification()
+    func delete(at indexPath: IndexPath) {
+        guard let fetResults = _fetchedResultsController else { return }
+        let context = fetResults.managedObjectContext
+        context.delete(fetResults.object(at: indexPath))
+        do {
+            try context.save()
+        } catch let error as NSError{
+            print(error)
+        }
     }
     
     func postupdateNotification(){
